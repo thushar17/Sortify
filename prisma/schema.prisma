@@ -12,6 +12,7 @@ model Link {
   originalUrl String
   slug        String   @unique
   createdAt   DateTime @default(now())
+  expiresAt DateTime?
   userId      String
   clicks      Click[]
   user        User     @relation(fields: [userId], references: [id])

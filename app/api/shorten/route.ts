@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { nanoid } from "nanoid";
 import { createLinkSchema } from "@/lib/validation";
-import { auth } from "@/auth";
+import { auth } from "@/auth"; 
 
 export async function POST(req:Request) {
      const session = await auth()
@@ -27,7 +27,6 @@ const user = await prisma.user.findUnique({
 }
     const body = await req.json()
     const result = createLinkSchema.safeParse(body)
-    console.log(result)
     if(!result.success){
         return NextResponse.json(
             {error: result.error.issues[0].message,},
@@ -36,6 +35,7 @@ const user = await prisma.user.findUnique({
     }
     const url = result.data.url
     const slug = result.data.slug
+    const expiresAt = result.data.expiresAt
     let finalslug
 if (slug?.trim()){
     const existing = await prisma.link.findUnique({
@@ -59,7 +59,9 @@ const link = await prisma.link.create({
         data:{
             originalUrl: url,
             slug: finalslug,
-            userId: user.id
+            expiresAt: expiresAt? new Date(expiresAt): null,
+            userId: user.id,
+            
         }
     })
 

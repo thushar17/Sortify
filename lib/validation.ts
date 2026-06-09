@@ -13,4 +13,5 @@ export const createLinkSchema = z.object({
     )
     .optional()
     .or(z.literal("")),
+    expiresAt: z.string().optional().or(z.literal(""))
 })

@@ -45,11 +45,20 @@ export async function GET(
     devices[device] =
      (devices[device]||0)+ 1
    }
+   const countries: Record<string, number> = {};
+   for (const click of link.clicks) {
+  const country =
+    click.country || "Unknown";
+
+  countries[country] =
+    (countries[country] || 0) + 1;
+}
     return NextResponse.json(
         {
             totalClicks: link.clicks.length, 
             browsers,
-            devices
+            devices,
+            countries
         }
     )
 }

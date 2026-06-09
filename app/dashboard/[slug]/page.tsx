@@ -50,7 +50,12 @@ export default async function AnalyticsPage({ params }: Props) {
       clicks: Number(count),
     })
   );
-
+const countryChartData = Object.entries(
+  analytics.countries
+).map(([country, count]) => ({
+  country,
+  clicks: Number(count),
+}));
   const topBrowser =
     browserChartData.reduce(
       (winner, item) => (item.clicks > winner.clicks ? item : winner),
@@ -162,6 +167,10 @@ export default async function AnalyticsPage({ params }: Props) {
       <div className="grid gap-6 xl:grid-cols-2">
         <AnalyticsChart data={browserChartData} xKey="browser" />
         <AnalyticsChart data={deviceChartData} xKey="device" />
+        <AnalyticsChart
+  xKey="Countries"
+  data={countryChartData}
+/>
       </div>
     </>
   );
