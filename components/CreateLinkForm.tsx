@@ -12,6 +12,7 @@ export default function CreateLinkForm() {
   const [loading, setLoading] = useState(false);
   const [slug, setSlug] = useState("");
   const [expiresAt , setExpiresAt] = useState("")
+  const [password, setPassword] = useState("")
   const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
@@ -21,22 +22,28 @@ export default function CreateLinkForm() {
       const data = await api.post("/api/shorten", {
         url,
         slug,
-        expiresAt
+        expiresAt,
+        password
       });
       setSortUrl(data.data.shortUrl);
       toast.success("Link created");
       setUrl("");
-      setLoading(false);
       setSlug("")
       setExpiresAt("")
       router.refresh();
-    } catch {
+    } catch (error){
+      if(error.response?.status===429){
+        toast.error("You have reached the hourly link creation limit.")
+        return;
+      }
       toast.error("Failed to create link");
       setUrl("");
-      setLoading(false);
       setSlug("")
       setExpiresAt("")
       router.refresh();
+    }
+    finally{
+      setLoading(false)
     }
   }
 
@@ -101,13 +108,28 @@ export default function CreateLinkForm() {
             </span>
           </label>
    
-   <label htmlFor=" ">
+   <label htmlFor="expiresAt">
       <span>Link Expiry</span>
       <input type="datetime-local"
         placeholder="Link expiry"
         value={expiresAt} 
         onChange={(e)=> setExpiresAt(e.target.value)}/>
    </label>
+   <label className="space-y-2">
+  <span className="field-label">
+    Password (Optional)
+  </span>
+
+  <input
+    type="password"
+    className="field-input"
+    placeholder="Protect this link"
+    value={password}
+    onChange={(e) =>
+      setPassword(e.target.value)
+    }
+  />
+</label>
           <div className="flex flex-col justify-end">
             <button
               className="primary-button w-full min-w-[180px]"

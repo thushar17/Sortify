@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { nanoid } from "nanoid";
 import { createLinkSchema } from "@/lib/validation";
 import { auth } from "@/auth"; 
-
+import { createLinkLimiter } from "@/lib/rateLimit";
+import bcrypt from 'bcryptjs'
 export async function POST(req:Request) {
      const session = await auth()
     if(!session?.user?.email)
@@ -25,6 +26,16 @@ const user = await prisma.user.findUnique({
     { status: 404 }
   );
 }
+
+// rate limit
+  const userEmail = session.user.email
+  const {success} = await createLinkLimiter.limit(userEmail)
+   if(!success){
+    return NextResponse.json(
+        {message: "Link limit Exceeded"},
+        {status: 429}
+    )
+   }
     const body = await req.json()
     const result = createLinkSchema.safeParse(body)
     if(!result.success){
@@ -36,6 +47,9 @@ const user = await prisma.user.findUnique({
     const url = result.data.url
     const slug = result.data.slug
     const expiresAt = result.data.expiresAt
+    const password = result.data.password
+    const hassedPassword = password?.trim() ?
+                            await bcrypt.hash(password,10): null
     let finalslug
 if (slug?.trim()){
     const existing = await prisma.link.findUnique({
@@ -61,6 +75,7 @@ const link = await prisma.link.create({
             slug: finalslug,
             expiresAt: expiresAt? new Date(expiresAt): null,
             userId: user.id,
+            password: hassedPassword
             
         }
     })

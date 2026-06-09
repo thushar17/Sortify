@@ -1,11 +1,11 @@
 import { AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import axios from "axios";
-
 import { getBrowser, getDevice } from "@/lib/analytics";
 import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
 
 type Props = {
   params: Promise<{
@@ -15,12 +15,29 @@ type Props = {
 
 export default async function PageRedirect({ params }: Props) {
   const { slug } = await params;
-
-  const link = await prisma.link.findUnique({
+  // chaching 
+const chachedLink = await redis.get(slug)
+let link 
+if(chachedLink){
+  link = chachedLink 
+}
+else{
+ link = await prisma.link.findUnique({
     where: {
       slug,
     },
   });
+}
+if(link){
+  await redis.set(
+    slug ,
+    JSON.stringify(link)
+  )
+  {
+    ex: 60*60
+  }
+}
+  
 
   // Link not found
   if (!link) {
@@ -58,6 +75,12 @@ export default async function PageRedirect({ params }: Props) {
     );
   }
 
+  const cookieStore = await cookies()
+
+  const verified = cookieStore.get(`verified-${slug}`)
+  if(link.password && !verified){
+     redirect(`/verify/${slug}`);
+  }
   // Expired link
   if (
     link.expiresAt &&
