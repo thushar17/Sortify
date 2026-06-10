@@ -9,6 +9,8 @@ import {
   getUserLinksWithClicks,
 } from "@/lib/dashboard";
 
+import ApiKeyCard from "@/components/dashboard/ApiKeyCard";
+
 export default async function ProfilePage() {
   const { session, user } = await getAuthenticatedDashboardContext();
   const dbLinks = await getUserLinksWithClicks(user.id);
@@ -145,6 +147,7 @@ export default async function ProfilePage() {
           </div>
         </div>
       </section>
+    <ApiKeyCard/>
     </>
   );
 }

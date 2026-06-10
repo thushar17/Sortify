@@ -33,4 +33,6 @@ model User {
   id    String @id @default(cuid())
   email String @unique
   links Link[]
+  apiKeyHash String?
+  apiKeyPrefix String?
 }
