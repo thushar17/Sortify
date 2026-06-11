@@ -34,5 +34,5 @@ model User {
   email String @unique
   links Link[]
   apiKeyHash String?
-  apiKeyPrefix String?
+  apiKeyPrefix String? @unique
 }
