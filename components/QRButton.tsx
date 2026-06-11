@@ -48,7 +48,7 @@ export default function QRButton({ shortUrl }: Props) {
       <AlertDialogContent className="max-w-xl border  border-white/80 bg-[rgba(255,255,255,0.82)] backdrop-blur-xl shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
         <button
           type="button"
-          className="absolute right-4 top-4 cursor-pointer inline-flex size-10 items-center justify-center rounded-2xl border border-white/80 bg-white/85 text-slate-500 shadow-[0_10px_24px_rgba(15,23,42,0.08)]  hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100"
+          className="action-button absolute right-4 top-4 !h-10 !w-10 !min-h-0 !min-w-0 !p-0 z-10"
           onClick={() => setOpen(false)}
           aria-label="Close QR dialog"
         >

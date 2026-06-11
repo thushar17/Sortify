@@ -152,10 +152,7 @@ export default function AnalyticsChart({
                   dataKey="clicks"
                   radius={[8, 8, 0, 0]}
                   fill="#3b82f6"
-                  background={{
-                    fill: "rgba(59,130,246,0.09)",
-                    radius: [8, 8, 0, 0],
-                  }}
+                  background={{ fill: "rgba(59,130,246,0.09)" }}
                 />
               </BarChart>
             )}

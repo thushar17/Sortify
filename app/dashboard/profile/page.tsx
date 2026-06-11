@@ -1,4 +1,4 @@
-import { KeyRound, Mail, UserRound } from "lucide-react";
+import { KeyRound, Mail } from "lucide-react";
 import Link from "next/link";
 
 import UserAvatar from "@/components/dashboard/UserAvatar";
@@ -17,13 +17,6 @@ export default async function ProfilePage() {
 
   const displayName = session.user?.name || "User";
   const displayEmail = session.user?.email || user.email;
-  const createdAt = user.createdAt
-    ? new Date(user.createdAt).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })
-    : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -59,15 +52,6 @@ export default async function ProfilePage() {
                   </p>
                 </div>
               </div>
-              {createdAt && (
-                <div className="flex items-center gap-3 rounded-2xl border border-[rgba(255,255,255,0.78)] bg-[rgba(255,255,255,0.6)] px-4 py-3 shadow-[0_8px_18px_rgba(15,23,42,0.04)]">
-                  <UserRound className="size-4 flex-shrink-0 text-[#64748b]" />
-                  <div>
-                    <p className="text-xs font-medium text-[#64748b]">Member since</p>
-                    <p className="text-sm font-medium text-[#0f172a]">{createdAt}</p>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
