@@ -6,7 +6,7 @@ Sortify allows users to create, manage, track, and secure short links while also
 
 ## 🌐 Live Demo
 
-**Website:** https://sortify-drab.vercel.app/
+**Website:** https://sortify-url.vercel.app/
 
 ---
 
