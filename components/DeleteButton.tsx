@@ -38,9 +38,13 @@ export default function DeleteButton({ id }: Props) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <button type="button" className="danger-button">
+        <button
+          type="button"
+          className="danger-button"
+          title="Delete link"
+          aria-label="Delete link"
+        >
           <Trash2 className="size-4" />
-          <span>Delete</span>
         </button>
       </AlertDialogTrigger>
 

@@ -58,8 +58,8 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         data-size={size}
         className={cn(
-          "group/alert-dialog-content fixed left-1/2 top-1/2 z-50 grid w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-hidden rounded-[2rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(245,247,255,0.84)_100%)] p-6 text-popover-foreground shadow-[0_35px_80px_rgba(15,23,42,0.18),0_12px_30px_rgba(79,70,229,0.08)] outline-none backdrop-blur-xl data-[size=default]:max-w-lg data-[size=sm]:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 sm:p-7",
-          "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top_left,rgba(147,197,253,0.2),transparent_30%),radial-gradient(circle_at_top_right,rgba(196,181,253,0.18),transparent_26%)] before:content-['']",
+          "group/alert-dialog-content fixed left-1/2 top-1/2 z-50 isolate grid w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-hidden rounded-[2rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(245,247,255,0.84)_100%)] p-6 text-popover-foreground shadow-[0_35px_80px_rgba(15,23,42,0.18),0_12px_30px_rgba(79,70,229,0.08)] outline-none backdrop-blur-xl data-[size=default]:max-w-lg data-[size=sm]:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 sm:p-7",
+          "before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-[radial-gradient(circle_at_top_left,rgba(147,197,253,0.2),transparent_30%),radial-gradient(circle_at_top_right,rgba(196,181,253,0.18),transparent_26%)] before:content-['']",
           className
         )}
         {...props}
