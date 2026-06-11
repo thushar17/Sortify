@@ -18,10 +18,10 @@ export default function CopyButton({ slug }: Props) {
       type="button"
       onClick={handleCopy}
       className="action-button"
+      title="Copy short link"
       aria-label={`Copy short link for ${slug}`}
     >
       <Copy className="size-4" />
-      <span>Copy</span>
     </button>
   );
 }

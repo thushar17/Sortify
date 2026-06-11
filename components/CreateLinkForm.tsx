@@ -1,19 +1,21 @@
 "use client";
-import { Link2, Sparkles } from "lucide-react";
+import { Link2, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { api } from "@/lib/api";
 import axios from "axios";
 
+import { api } from "@/lib/api";
+
 export default function CreateLinkForm() {
+  const [open, setOpen] = useState(false);
   const [url, setUrl] = useState("");
-  const [sortUrl, setSortUrl] = useState("");
-  const [loading, setLoading] = useState(false);
   const [slug, setSlug] = useState("");
-  const [expiresAt , setExpiresAt] = useState("")
-  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false);
+  const [expiresAt, setExpiresAt] = useState("");
+  const [password, setPassword] = useState("");
+  const [sortUrl, setSortUrl] = useState("");
   const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
@@ -24,151 +26,159 @@ export default function CreateLinkForm() {
         url,
         slug,
         expiresAt,
-        password
+        password,
       });
       setSortUrl(data.data.shortUrl);
       toast.success("Link created");
       setUrl("");
-      setSlug("")
-      setExpiresAt("")
+      setSlug("");
+      setExpiresAt("");
+      setPassword("");
       router.refresh();
-    } catch (error){
-      if(
-        axios.isAxiosError(error) &&
-        error.response?.status === 429
-      ){
-        toast.error("You have reached the hourly link creation limit.")
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
+        toast.error("You have reached the hourly link creation limit.");
         return;
       }
       toast.error("Failed to create link");
       setUrl("");
-      setSlug("")
-      setExpiresAt("")
+      setSlug("");
+      setExpiresAt("");
       router.refresh();
-    }
-    finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <section className="glass-card section-shell">
-      <div className="relative flex flex-col gap-6">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-          <div className="space-y-3">
-            <span className="eyebrow">Create Link</span>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-                Turn any destination into a clean, trackable short URL
-              </h2>
-              <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-                Paste a long URL, add an optional custom slug, and publish a
-                polished link that fits the rest of your workspace.
-              </p>
-            </div>
-          </div>
-
-          <div className="surface-muted flex items-center gap-3 px-4 py-3 text-sm text-slate-600">
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-500 text-white shadow-[0_14px_30px_rgba(79,70,229,0.24)]">
-              <Sparkles className="size-4" />
-            </div>
-            <div>
-              <p className="font-semibold text-slate-900">Instant creation</p>
-              <p className="text-xs text-slate-500">
-                Refreshes the dashboard as soon as the link is generated.
-              </p>
-            </div>
-          </div>
+    <div className="glass-card overflow-hidden">
+      <div className="flex items-center justify-between gap-3 border-b border-[rgba(148,163,184,0.18)] px-4 py-3">
+        <div>
+          <p className="text-sm font-semibold text-[#0f172a]">New link</p>
+          <p className="text-xs text-[#64748b]">
+            Create a short link with optional expiry and password protection.
+          </p>
         </div>
-
-        <div className="subtle-divider" />
-
-        <form onSubmit={handleSubmit} className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_220px_auto]">
-          <label className="space-y-2">
-            <span className="field-label">Destination URL</span>
-            <input
-              className="field-input"
-              type="text"
-              placeholder="https://example.com/your-long-link"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-            />
-            <span className="field-help">
-              Use the full destination link you want your visitors to open.
-            </span>
-          </label>
-
-          <label className="space-y-2">
-            <span className="field-label">Custom slug</span>
-            <input
-              className="field-input"
-              type="text"
-              placeholder="optional-slug"
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-            />
-            <span className="field-help">
-              Leave blank to generate a short random slug automatically.
-            </span>
-          </label>
-   
-   <label htmlFor="expiresAt">
-      <span>Link Expiry</span>
-      <input type="datetime-local"
-        placeholder="Link expiry"
-        value={expiresAt} 
-        onChange={(e)=> setExpiresAt(e.target.value)}/>
-   </label>
-   <label className="space-y-2">
-  <span className="field-label">
-    Password (Optional)
-  </span>
-
-  <input
-    type="password"
-    className="field-input"
-    placeholder="Protect this link"
-    value={password}
-    onChange={(e) =>
-      setPassword(e.target.value)
-    }
-  />
-</label>
-          <div className="flex flex-col justify-end">
-            <button
-              className="primary-button w-full min-w-[180px]"
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? (
-                <span className="inline-flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-white/80" />
-                  <span>Creating...</span>
-                </span>
-              ) : (
-                <>
-                  <Link2 className="size-4" />
-                  <span>Create short link</span>
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-
-        {sortUrl && (
-          <div className="surface-muted flex flex-col gap-3 px-4 py-4 sm:px-5">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-                Latest short URL
-              </p>
-              <span className="status-badge w-fit">Ready to share</span>
-            </div>
-            <p className="break-all rounded-2xl border border-white/75 bg-white/72 px-4 py-3 font-mono text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:text-base">
-              {sortUrl}
-            </p>
-          </div>
-        )}
+        <button
+          id="toggle-create-link"
+          onClick={() => {
+            setOpen((v) => !v);
+            setSortUrl("");
+          }}
+          className="secondary-button h-8 px-3 text-xs text-[#4f46e5]"
+        >
+          {open ? (
+            <>
+              <X className="size-3" />
+              Cancel
+            </>
+          ) : (
+            <>
+              <Plus className="size-3" />
+              Create link
+            </>
+          )}
+        </button>
       </div>
-    </section>
+
+      {open && (
+        <div className="border-t border-[rgba(148,163,184,0.18)] bg-[rgba(255,255,255,0.34)] px-4 py-4">
+          <form
+            onSubmit={handleSubmit}
+            className="grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.9fr)]"
+          >
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="field-label">Destination URL *</label>
+                <input
+                  className="field-input"
+                  type="text"
+                  placeholder="https://example.com/very-long-url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="field-label">Custom slug</label>
+                <input
+                  className="field-input font-mono"
+                  type="text"
+                  placeholder="my-link"
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                <div className="space-y-1.5">
+                  <label className="field-label">Expires at</label>
+                  <input
+                    className="field-input"
+                    type="datetime-local"
+                    value={expiresAt}
+                    onChange={(e) => setExpiresAt(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="field-label">Password</label>
+                  <input
+                    className="field-input"
+                    type="password"
+                    placeholder="Optional"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <button
+                className="primary-button w-full whitespace-nowrap"
+                type="submit"
+                disabled={loading || !url}
+              >
+                {loading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span className="h-2 w-2 animate-pulse rounded-full bg-white/80" />
+                    Creating...
+                  </span>
+                ) : (
+                  <>
+                    <Link2 className="size-3.5" />
+                    Shorten
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+
+          {sortUrl && (
+            <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-[rgba(59,130,246,0.18)] bg-[rgba(255,255,255,0.58)] px-4 py-3 shadow-[0_10px_22px_rgba(15,23,42,0.04)] sm:flex-row sm:items-center">
+              <div className="min-w-0 flex-1">
+                <p className="mb-0.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#4f46e5]">
+                  Your short link
+                </p>
+                <p className="truncate font-mono text-sm text-[#0f172a]">
+                  {sortUrl}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(sortUrl);
+                  toast.success("Copied to clipboard");
+                }}
+                className="secondary-button h-8 px-3 text-xs"
+              >
+                Copy
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

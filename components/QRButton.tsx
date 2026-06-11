@@ -34,16 +34,21 @@ export default function QRButton({ shortUrl }: Props) {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <button type="button" onClick={generateQR} className="action-button">
+        <button
+          type="button"
+          onClick={generateQR}
+          className="action-button"
+          title="QR Code"
+          aria-label="Generate QR code"
+        >
           <QrCode className="size-4" />
-          <span>QR Code</span>
         </button>
       </AlertDialogTrigger>
 
-      <AlertDialogContent className="max-w-xl">
+      <AlertDialogContent className="max-w-xl border  border-white/80 bg-[rgba(255,255,255,0.82)] backdrop-blur-xl shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
         <button
           type="button"
-          className="absolute right-4 top-4 inline-flex size-10 items-center justify-center rounded-2xl border border-white/80 bg-white/85 text-slate-500 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition duration-200 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100"
+          className="absolute right-4 top-4 cursor-pointer inline-flex size-10 items-center justify-center rounded-2xl border border-white/80 bg-white/85 text-slate-500 shadow-[0_10px_24px_rgba(15,23,42,0.08)]  hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100"
           onClick={() => setOpen(false)}
           aria-label="Close QR dialog"
         >
@@ -67,17 +72,17 @@ export default function QRButton({ shortUrl }: Props) {
                 width={250}
                 height={250}
                 unoptimized
-                className="rounded-[1.5rem] border border-white/80 bg-white p-4 shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
+                className="rounded-[1.5rem] border border-white/80 bg-white p-4 shadow-sm"
               />
             )}
           </div>
 
           <div className="space-y-4">
             <div className="surface-muted p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#64748b]">
                 Short URL
               </p>
-              <p className="mt-2 break-all text-sm leading-6 text-slate-700">
+              <p className="mt-2 break-all font-mono text-sm leading-6 text-[#0f172a]">
                 {shortUrl}
               </p>
             </div>

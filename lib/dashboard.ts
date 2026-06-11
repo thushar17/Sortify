@@ -8,7 +8,7 @@ export const getAuthenticatedDashboardContext = cache(async () => {
   const session = await auth();
 
   if (!session?.user?.email) {
-    redirect("/api/auth/signin");
+    redirect("/sign-in");
   }
 
   const user = await prisma.user.findUnique({
@@ -18,7 +18,7 @@ export const getAuthenticatedDashboardContext = cache(async () => {
   });
 
   if (!user) {
-    redirect("/api/auth/signin");
+    redirect("/sign-in");
   }
 
   return { session, user };
@@ -32,6 +32,9 @@ export const getUserLinksWithClicks = cache(async (userId: string) => {
     include: {
       clicks: true,
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 });
 
@@ -44,15 +47,19 @@ export function formatDashboardLinks(
     originalUrl: link.originalUrl,
     totalClicks: link.clicks.length,
     createdAt: link.createdAt,
+    expiresAt: link.expiresAt,
   }));
 }
 
 export function getLinkMetrics(
   links: ReturnType<typeof formatDashboardLinks>
 ) {
+  const now = new Date();
   const totalLinks = links.length;
   const totalClicks = links.reduce((sum, link) => sum + link.totalClicks, 0);
-  const activeLinks = links.filter((link) => link.totalClicks > 0).length;
+  const activeLinks = links.filter(
+    (link) => !link.expiresAt || link.expiresAt > now
+  ).length;
 
   return {
     totalLinks,
