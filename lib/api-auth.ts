@@ -6,7 +6,7 @@ export async function authenticateApiKey(apiKey: string) {
     if(!apiKey){
         return null
     }
-    const apiKeyPrefix = apiKey.replace("_sortify","").slice(0,8)
+    const apiKeyPrefix = apiKey.replace("sk_sortify_","").slice(0,8)
 
     const user = await prisma.user.findUnique({
         where:{

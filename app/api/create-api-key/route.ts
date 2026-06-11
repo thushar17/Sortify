@@ -24,7 +24,7 @@ if(!session?.user?.email){
 
 const apiKey = generateApiKey()
 const apiKeyPrefix = apiKey
-.replace("_sortify","")
+.replace("sk_sortify_","")
 .slice(0,8) 
 const apiKeyHash =await bcrypt.hash(apiKey, 10)
 

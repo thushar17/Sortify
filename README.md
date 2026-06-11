@@ -1,36 +1,268 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Sortify
 
-## Getting Started
+A modern full-stack URL shortening platform built with Next.js, Prisma, PostgreSQL, Redis, and Auth.js.
 
-First, run the development server:
+Sortify allows users to create, manage, track, and secure short links while also providing a developer-friendly REST API with API key authentication.
+
+## 🌐 Live Demo
+
+**Website:** https://sortify-drab.vercel.app/
+
+---
+
+# ✨ Features
+
+### 🔗 URL Shortening
+
+* Create short URLs instantly
+* Generate random slugs automatically
+* Create custom slugs
+* Copy links with one click
+
+### 🔒 Secure Links
+
+* Password-protected links
+* Expiry date support
+* Protected access verification
+
+### 📊 Analytics
+
+Track link performance with:
+
+* Total clicks
+* Browser analytics
+* Device analytics
+* Country tracking
+* Link-level insights
+
+### 📱 QR Codes
+
+Generate QR codes for every short URL and share links quickly across devices.
+
+### ⚡ Performance
+
+* Redis caching using Upstash
+* Faster link resolution
+* Reduced database queries
+
+### 🛡️ Security & Protection
+
+* Google OAuth Authentication
+* Dashboard rate limiting
+* API rate limiting
+* Secure API key hashing using bcrypt
+
+### 👨‍💻 Developer Platform
+
+Generate API keys and access Sortify programmatically.
+
+Available API endpoints:
+
+* Create links
+* Get all links
+* View analytics
+* Delete links
+
+### 🔍 Productivity Features
+
+* Search links
+* Pagination
+* Dashboard management
+* Profile page
+* API documentation
+
+---
+
+# 🏗️ Tech Stack
+
+## Frontend
+
+* Next.js 15
+* React
+* TypeScript
+* Tailwind CSS
+* Lucide Icons
+
+## Backend
+
+* Next.js Route Handlers
+* Prisma ORM
+
+## Database
+
+* PostgreSQL (Neon)
+
+## Authentication
+
+* Auth.js (NextAuth)
+* Google OAuth
+
+## Caching
+
+* Upstash Redis
+
+## Rate Limiting
+
+* Upstash Ratelimit
+
+## Validation
+
+* Zod
+
+## API Security
+
+* bcryptjs
+
+---
+
+# 📚 REST API
+
+## Authentication
+
+Send API key in request headers:
+
+```http
+x-api-key: sk_sortify_xxxxxxxxxxxxxxxxx
+```
+
+---
+
+## Create Link
+
+```http
+POST /api/v1/links
+```
+
+Request:
+
+```json
+{
+  "url": "https://google.com",
+  "slug": "google"
+}
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "shortUrl": "https://your-domain.com/google"
+}
+```
+
+---
+
+## Get Links
+
+```http
+GET /api/v1/links
+```
+
+---
+
+## Get Analytics
+
+```http
+GET /api/v1/analytics/[slug]
+```
+
+---
+
+## Delete Link
+
+```http
+DELETE /api/v1/links/[slug]
+```
+
+---
+
+# 📸 Screenshots
+
+Add screenshots here:
+
+* Landing Page
+* Dashboard
+* Analytics Page
+* API Documentation
+* Profile Page
+* QR Code Feature
+
+---
+
+# 🚀 Local Setup
+
+Clone the repository:
+
+```bash
+git clone https://github.com/your-username/sortify.git
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create a `.env` file:
+
+```env
+DATABASE_URL=
+AUTH_SECRET=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+Run development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Build for production:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm start
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+# 🧠 What I Learned
 
-To learn more about Next.js, take a look at the following resources:
+While building Sortify, I gained hands-on experience with:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* Full-stack application architecture
+* Authentication and authorization
+* Database design using Prisma
+* Redis caching strategies
+* API key authentication
+* REST API development
+* Rate limiting implementation
+* Production deployment workflows
+* TypeScript and Next.js App Router
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+# 📈 Future Improvements
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* API usage analytics
+* Team workspaces
+* Custom domains
+* Webhooks
+* Bulk URL creation
+* Advanced analytics dashboard
+* Link tags and categories
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+# 👨‍💻 Author
+
+**Thushar Rai**
+
+B.Tech CSE (2028)
+
+Passionate about Full-Stack Development, AI, and building scalable web applications.
