@@ -1,9 +1,11 @@
+"use client"
 import { ArrowUpRight, Link2, MousePointerClick } from "lucide-react";
 import Link from "next/link";
 
 import CopyButton from "./CopyButton";
 import DeleteButton from "./DeleteButton";
 import QRButton from "./QRButton";
+import { useState } from "react";
 
 type LinkItem = {
   id: string;
@@ -17,6 +19,16 @@ type Props = {
 };
 
 export default function LinkTable({ links }: Props) {
+  const ITEMS_PER_PAGE = 10
+  const [currentPage, setCurrentPage] = useState(1)
+  const totalPages = Math.ceil(
+    links.length /ITEMS_PER_PAGE
+  )
+  const paginatedLinks = links.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage* ITEMS_PER_PAGE
+
+  )
   return (
     <section className="glass-card section-shell">
       <div className="flex flex-col gap-6">
@@ -67,7 +79,7 @@ export default function LinkTable({ links }: Props) {
         ) : (
           <>
             <div className="grid gap-4 lg:hidden">
-              {links.map((link) => (
+              {paginatedLinks.map((link) => (
                 <article
                   key={link.id}
                   className="rounded-[1.75rem] border border-white/80 bg-white/78 p-5 shadow-[0_16px_36px_rgba(15,23,42,0.07)] backdrop-blur-sm"
@@ -137,7 +149,7 @@ export default function LinkTable({ links }: Props) {
                     </thead>
 
                     <tbody className="divide-y divide-slate-200/65">
-                      {links.map((link) => (
+                      {paginatedLinks.map((link) => (
                         <tr
                           key={link.id}
                           className="transition duration-200 hover:bg-blue-50/45"
@@ -189,6 +201,37 @@ export default function LinkTable({ links }: Props) {
           </>
         )}
       </div>
+      {totalPages > 1 && (
+  <div className="mt-6 flex items-center justify-center gap-3">
+    <button
+      onClick={() =>
+        setCurrentPage((p) =>
+          Math.max(1, p - 1)
+        )
+      }
+      disabled={currentPage === 1}
+      className="secondary-button"
+    >
+      Previous
+    </button>
+
+    <span className="text-sm font-medium">
+      Page {currentPage} of {totalPages}
+    </span>
+
+    <button
+      onClick={() =>
+        setCurrentPage((p) =>
+          Math.min(totalPages, p + 1)
+        )
+      }
+      disabled={currentPage === totalPages}
+      className="secondary-button"
+    >
+      Next
+    </button>
+  </div>
+)}
     </section>
   );
 }

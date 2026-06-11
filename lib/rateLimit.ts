@@ -10,3 +10,8 @@ export const redirectLimiter = new Ratelimit({
   redis,
   limiter: Ratelimit.fixedWindow(100, "1 h"),
 });
+
+export const apiLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.fixedWindow(100, "1 h")
+})

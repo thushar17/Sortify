@@ -3,7 +3,7 @@ import { authenticateApiKey } from "@/lib/api-auth";
 import { createLinkSchema } from "@/lib/validation";
 import { prisma } from "@/lib/prisma";
 import { nanoid } from "nanoid";
-
+import { apiLimiter } from "@/lib/rateLimit";
 export async function POST(req:Request) {
     const apiKey = req.headers.get("x-api-key")
     const user = await authenticateApiKey(apiKey|| "")
@@ -16,6 +16,18 @@ export async function POST(req:Request) {
         status: 401,
       }
     );
+  }
+  const {success} = await 
+  apiLimiter.limit(`api:${user.id}`)
+  if(!success){
+     return NextResponse.json(
+        {
+            error: "Hourly limit exceeded"
+        },
+        {
+            status: 429 
+        }
+     )
   }
   const data = await req.json()
 
