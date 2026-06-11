@@ -1,6 +1,5 @@
 import { ArrowRight, ChartColumnBig, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
-
 export default function Home() {
   return (
     <main className="page-shell min-h-screen justify-center">

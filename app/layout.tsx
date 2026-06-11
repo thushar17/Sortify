@@ -9,8 +9,12 @@ import "./globals.css";
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "Sortify",
-  description: "Premium short-link dashboard with analytics insights.",
+  title: {
+    default: "Sortify",
+    template: "%s | Sortify",
+  },
+  description:
+    "Modern URL shortening platform with analytics and developer APIs.",
 };
 
 export default function RootLayout({

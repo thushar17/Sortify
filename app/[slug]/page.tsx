@@ -6,7 +6,7 @@ import axios from "axios";
 import { getBrowser, getDevice } from "@/lib/analytics";
 import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
-
+import type { Link as PrismaLink } from "@prisma/client";
 type Props = {
   params: Promise<{
     slug: string;
@@ -16,29 +16,32 @@ type Props = {
 export default async function PageRedirect({ params }: Props) {
   const { slug } = await params;
   // chaching 
-const chachedLink = await redis.get(slug)
-let link 
-if(chachedLink){
-  link = chachedLink 
-}
-else{
- link = await prisma.link.findUnique({
+const cachedLink = await redis.get(slug);
+
+let link: PrismaLink | null = null;
+
+if (cachedLink) {
+  link =
+    typeof cachedLink === "string"
+      ? (JSON.parse(cachedLink) as PrismaLink)
+      : (cachedLink as PrismaLink);
+} else {
+  link = await prisma.link.findUnique({
     where: {
       slug,
     },
   });
-}
-if(link){
-  await redis.set(
-    slug ,
-    JSON.stringify(link)
-  )
-  {
-    ex: 60*60
+
+  if (link) {
+    await redis.set(
+      slug,
+      JSON.stringify(link),
+      {
+        ex: 60 * 60,
+      }
+    );
   }
 }
-  
-
   // Link not found
   if (!link) {
     return (

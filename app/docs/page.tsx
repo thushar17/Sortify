@@ -6,7 +6,13 @@ import {
   Trash2,
   ArrowRight,
 } from "lucide-react";
+import { Metadata } from "next";
 
+export const metadata : Metadata={
+  title: "Sortify",
+  description:
+    "Modern URL shortening platform with analytics, QR codes and developer APIs.",
+}
 export default function DocsPage() {
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6">

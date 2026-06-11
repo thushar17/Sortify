@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { api } from "@/lib/api";
+import axios from "axios";
 
 export default function CreateLinkForm() {
   const [url, setUrl] = useState("");
@@ -32,7 +33,10 @@ export default function CreateLinkForm() {
       setExpiresAt("")
       router.refresh();
     } catch (error){
-      if(error.response?.status===429){
+      if(
+        axios.isAxiosError(error) &&
+        error.response?.status === 429
+      ){
         toast.error("You have reached the hourly link creation limit.")
         return;
       }

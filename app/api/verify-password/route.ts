@@ -14,7 +14,16 @@ export async function POST(req: Request) {
             slug
         }
     })
-
+   if (!link) {
+  return NextResponse.json(
+    {
+      error: "Link not found",
+    },
+    {
+      status: 404,
+    }
+  );
+}
 
     if (!link.password) {
     return NextResponse.json(

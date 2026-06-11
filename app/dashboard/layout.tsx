@@ -1,5 +1,12 @@
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { getAuthenticatedDashboardContext } from "@/lib/dashboard";
+import { Metadata } from "next";
+
+export const metadata : Metadata={
+  title: "Sortify",
+  description:
+    "Modern URL shortening platform with analytics, QR codes and developer APIs.",
+}
 
 export default async function DashboardLayout({
   children,
@@ -7,8 +14,9 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const { session } = await getAuthenticatedDashboardContext();
-
+ 
   return (
+    
     <main className="page-shell max-w-[90rem] lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start lg:gap-6">
       <DashboardSidebar
         userName={session.user?.name}

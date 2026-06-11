@@ -21,10 +21,24 @@ type Props = {
 export default function LinkTable({ links }: Props) {
   const ITEMS_PER_PAGE = 10
   const [currentPage, setCurrentPage] = useState(1)
-  const totalPages = Math.ceil(
-    links.length /ITEMS_PER_PAGE
+  const [search , setSearch] = useState("")
+
+
+  // filter 
+  const filterLink = links.filter(
+    (link)=>
+      link.slug
+          .toLowerCase()
+          .includes(search.toLowerCase())|| 
+          link.originalUrl
+          .toLowerCase()
+          .includes(search.toLowerCase())
   )
-  const paginatedLinks = links.slice(
+   const totalPages = Math.ceil(
+    filterLink.length /ITEMS_PER_PAGE
+  )
+  // paginantion
+  const paginatedLinks = filterLink.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage* ITEMS_PER_PAGE
 
@@ -52,7 +66,7 @@ export default function LinkTable({ links }: Props) {
             </div>
             <div>
               <p className="font-semibold text-slate-900">
-                {links.length} {links.length === 1 ? "link" : "links"} tracked
+                {filterLink.length} {filterLink.length === 1 ? "link" : "links"} tracked
               </p>
               <p className="text-xs text-slate-500">
                 Access analytics, QR codes, copy, and delete actions quickly.
@@ -62,8 +76,19 @@ export default function LinkTable({ links }: Props) {
         </div>
 
         <div className="subtle-divider" />
-
-        {links.length === 0 ? (
+        <div className="flex justify-end">
+  <input
+    type="text"
+    placeholder="Search links..."
+    value={search}
+    onChange={(e) => {
+      setSearch(e.target.value);
+      setCurrentPage(1);
+    }}
+    className="field-input w-full max-w-sm"
+  />
+</div>
+        {filterLink.length === 0 ? (
           <div className="surface-muted flex flex-col items-center justify-center gap-4 px-6 py-14 text-center">
             <div className="empty-state-orb">0</div>
             <div className="space-y-2">

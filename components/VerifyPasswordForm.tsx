@@ -3,6 +3,7 @@ import React, { useState } from "react"
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
+import axios from "axios";
 type Props = {
   slug: string;
 };
@@ -24,8 +25,14 @@ export default function VerifyPasswordForm({
       toast.success("password Verified")
      window.location.href = `/${slug}`;
     } catch (error) {
+       if (axios.isAxiosError(error)){
+         toast.error(
+      error.response?.data?.error ||
+      "Verification failed"
+    );
+    return;
+       }
       toast.error(
-        error.response?.data?.error ||
         "Verification failed"
       )
     }
