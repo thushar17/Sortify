@@ -14,33 +14,57 @@ type Props = {
 
 export default async function PageRedirect({ params }: Props) {
   const { slug } = await params;
-  // chaching 
-const cachedLink = await redis.get(slug);
 
-let link: PrismaLink | null = null;
+  let link: PrismaLink | null = null;
 
-if (cachedLink) {
-  link =
-    typeof cachedLink === "string"
-      ? (JSON.parse(cachedLink) as PrismaLink)
-      : (cachedLink as PrismaLink);
-} else {
-  link = await prisma.link.findUnique({
-    where: {
-      slug,
-    },
-  });
-
-  if (link) {
-    await redis.set(
-      slug,
-      JSON.stringify(link),
-      {
-        ex: 60 * 60,
-      }
-    );
+  // Try Redis cache first, fall back to DB on any error
+  try {
+    const cachedLink = await redis.get(slug);
+    if (cachedLink) {
+      link =
+        typeof cachedLink === "string"
+          ? (JSON.parse(cachedLink) as PrismaLink)
+          : (cachedLink as PrismaLink);
+    }
+  } catch (error) {
+    console.error("[redis] cache lookup failed:", error);
   }
-}
+
+  // If not in cache, query DB
+  if (!link) {
+    try {
+      link = await prisma.link.findUnique({ where: { slug } });
+
+      if (link) {
+        // Best-effort cache write — don't crash if Redis is down
+        try {
+          await redis.set(slug, JSON.stringify(link), { ex: 60 * 60 });
+        } catch (error) {
+          console.error("[redis] cache write failed:", error);
+        }
+      }
+    } catch (error) {
+      console.error("[prisma] DB lookup failed:", error);
+      // DB is unavailable — show a friendly error instead of crashing
+      return (
+        <main className="page-shell min-h-screen items-center justify-center">
+          <section className="glass-card section-shell w-full max-w-xl text-center">
+            <div className="space-y-4">
+              <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[#0f172a]">
+                Something went wrong
+              </h1>
+              <p className="text-[#475569]">
+                We couldn&apos;t process this link right now. Please try again in a moment.
+              </p>
+              <Link href="/" className="secondary-button">
+                Return Home
+              </Link>
+            </div>
+          </section>
+        </main>
+      );
+    }
+  }
   // Link not found
   if (!link) {
     return (
