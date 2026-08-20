@@ -2,7 +2,6 @@ import { AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import axios from "axios";
 import { getBrowser, getDevice } from "@/lib/analytics";
 import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
@@ -130,25 +129,26 @@ if (cachedLink) {
 
   if (ip) {
     try {
-      const { data } = await axios.get(
-        `http://ip-api.com/json/${ip}`
-      );
-
-      country =
-        data.country || "Unknown";
+      const res = await fetch(`https://ip-api.com/json/${ip}`);
+      const data = await res.json();
+      country = data.country || "Unknown";
     } catch (error) {
-      console.log(error);
+      console.error("[ip-api] failed to resolve country:", error);
     }
   }
 
-  await prisma.click.create({
-    data: {
-      browser,
-      device,
-      country,
-      linkId: link.id,
-    },
-  });
+  try {
+    await prisma.click.create({
+      data: {
+        browser,
+        device,
+        country,
+        linkId: link.id,
+      },
+    });
+  } catch (error) {
+    console.error("[analytics] failed to record click:", error);
+  }
 
   redirect(link.originalUrl);
 }
