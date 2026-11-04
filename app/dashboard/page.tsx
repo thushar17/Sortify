@@ -1,95 +1,61 @@
-import { Activity, Link2, MousePointerClick } from "lucide-react";
+import { Suspense } from "react";
 
-import CreateLinkForm from "@/components/CreateLinkForm";
-import LinkTable from "@/components/LinkTable";
+import LinkTable from "@/components/app/link-table";
+import NewLinkDialog from "@/components/app/new-link-dialog";
+import PageHeader from "@/components/app/page-header";
+import StatStrip from "@/components/app/stat-strip";
 import {
   formatDashboardLinks,
   getAuthenticatedDashboardContext,
   getLinkMetrics,
   getUserLinksWithClicks,
 } from "@/lib/dashboard";
-import type { CSSProperties } from "react";
+import { formatCompact, formatNumber } from "@/lib/format";
 
-export default async function getDashboard() {
+function percentChange(current: number, previous: number) {
+  if (previous === 0) return null;
+  return ((current - previous) / previous) * 100;
+}
+
+export default async function DashboardPage() {
   const { user } = await getAuthenticatedDashboardContext();
-  const dbLinks = await getUserLinksWithClicks(user.id);
-  const links = formatDashboardLinks(dbLinks);
-  const { totalLinks, totalClicks, activeLinks } = getLinkMetrics(links);
+  const rawLinks = await getUserLinksWithClicks(user.id);
+  const links = formatDashboardLinks(rawLinks);
+  const metrics = getLinkMetrics(rawLinks);
 
-  const metrics = [
+  const stats = [
     {
-      label: "Total links",
-      value: totalLinks,
-      icon: Link2,
-      color: "text-[#3b82f6]",
-      bg: "bg-[rgba(59,130,246,0.1)]",
-      borderAccent: "#3b82f6",
+      label: "Links",
+      value: formatNumber(metrics.totalLinks),
+      hint: `${formatNumber(metrics.activeLinks)} active`,
     },
     {
-      label: "Total clicks",
-      value: totalClicks,
-      icon: MousePointerClick,
-      color: "text-[#8b5cf6]",
-      bg: "bg-[rgba(139,92,246,0.1)]",
-      borderAccent: "#8b5cf6",
+      label: "Clicks, last 30 days",
+      value: formatCompact(metrics.clicks30d),
+      change: percentChange(metrics.clicks30d, metrics.clicksPrev30d),
+      hint: metrics.clicksPrev30d > 0 ? "vs previous 30 days" : "No earlier data",
+      trend: metrics.dailyClicks,
     },
     {
-      label: "Active links",
-      value: activeLinks,
-      icon: Activity,
-      color: "text-[#22c55e]",
-      bg: "bg-[rgba(34,197,94,0.1)]",
-      borderAccent: "#22c55e",
+      label: "Active",
+      value: formatNumber(metrics.activeLinks),
+      hint: `${formatNumber(metrics.totalLinks - metrics.activeLinks)} expired`,
+    },
+    {
+      label: "Password protected",
+      value: formatNumber(metrics.protectedLinks),
+      hint: metrics.protectedLinks === 1 ? "link" : "links",
     },
   ];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <div>
-          <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-[#0f172a]">
-            Dashboard
-          </h1>
-          <p className="text-sm text-[#475569]">
-            Manage your short links and monitor performance.
-          </p>
-        </div>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        {metrics.map((metric) => {
-          const Icon = metric.icon;
-          return (
-            <div
-              key={metric.label}
-              className="glass-card metric-card"
-              style={{ "--metric-accent": metric.borderAccent } as CSSProperties}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                    {metric.label}
-                  </p>
-                  <p className="mt-2 text-[1.75rem] font-semibold tracking-[-0.03em] text-[#0f172a]">
-                    {metric.value}
-                  </p>
-                </div>
-                <div
-                  className={`flex size-11 flex-shrink-0 items-center justify-center rounded-2xl ${metric.bg}`}
-                >
-                  <Icon className={`size-5 ${metric.color}`} />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Create link form */}
-      <CreateLinkForm />
-
-      {/* Link table */}
+    <>
+      <PageHeader title="Links" description="Create, share, and track your short links." />
+      <StatStrip stats={stats} />
       <LinkTable links={links} />
-    </div>
+      <Suspense>
+        <NewLinkDialog />
+      </Suspense>
+    </>
   );
 }

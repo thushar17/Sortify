@@ -13,7 +13,8 @@ export default async function ProfilePage() {
   const { session, user } = await getAuthenticatedDashboardContext();
   const dbLinks = await getUserLinksWithClicks(user.id);
   const links = formatDashboardLinks(dbLinks);
-  const { totalLinks, totalClicks } = getLinkMetrics(links);
+  const { totalLinks } = getLinkMetrics(dbLinks);
+  const totalClicks = links.reduce((sum, link) => sum + link.totalClicks, 0);
 
   const displayName = session.user?.name || "User";
   const displayEmail = session.user?.email || user.email;

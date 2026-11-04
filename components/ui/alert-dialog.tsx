@@ -36,7 +36,7 @@ function AlertDialogOverlay({
     <AlertDialogPrimitive.Overlay
       data-slot="alert-dialog-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-[rgba(15,23,42,0.18)] duration-200 supports-backdrop-filter:backdrop-blur-md data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        "fixed inset-0 z-50 bg-black/30 duration-100 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className
       )}
       {...props}
@@ -58,8 +58,7 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         data-size={size}
         className={cn(
-          "group/alert-dialog-content fixed left-1/2 top-1/2 z-50 isolate grid w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-hidden rounded-[2rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(245,247,255,0.84)_100%)] p-6 text-popover-foreground shadow-[0_35px_80px_rgba(15,23,42,0.18),0_12px_30px_rgba(79,70,229,0.08)] outline-none backdrop-blur-xl data-[size=default]:max-w-lg data-[size=sm]:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 sm:p-7",
-          "before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-[radial-gradient(circle_at_top_left,rgba(147,197,253,0.2),transparent_30%),radial-gradient(circle_at_top_right,rgba(196,181,253,0.18),transparent_26%)] before:content-['']",
+          "group/alert-dialog-content fixed left-1/2 top-1/2 z-50 grid w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl border bg-popover p-5 text-sm text-popover-foreground shadow-float outline-none duration-100 data-[size=default]:max-w-md data-[size=sm]:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
         {...props}
@@ -76,7 +75,7 @@ function AlertDialogHeader({
     <div
       data-slot="alert-dialog-header"
       className={cn(
-        "relative flex flex-col gap-2 text-center sm:text-left",
+        "flex flex-col gap-1.5 text-left",
         className
       )}
       {...props}
@@ -92,7 +91,7 @@ function AlertDialogFooter({
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        "relative flex flex-col-reverse gap-3 sm:flex-row sm:justify-end",
+        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
         className
       )}
       {...props}
@@ -108,7 +107,7 @@ function AlertDialogMedia({
     <div
       data-slot="alert-dialog-media"
       className={cn(
-        "inline-flex size-14 items-center justify-center rounded-[1.25rem] border border-white/80 bg-white/85 text-slate-700 shadow-[0_14px_35px_rgba(15,23,42,0.08)] *:[svg:not([class*='size-'])]:size-6",
+        "inline-flex size-9 items-center justify-center rounded-md border bg-muted text-muted-foreground *:[svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
@@ -124,7 +123,7 @@ function AlertDialogTitle({
     <AlertDialogPrimitive.Title
       data-slot="alert-dialog-title"
       className={cn(
-        "font-heading text-xl font-semibold tracking-tight text-slate-950",
+        "text-base font-semibold text-foreground",
         className
       )}
       {...props}
@@ -140,7 +139,7 @@ function AlertDialogDescription({
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
       className={cn(
-        "text-sm leading-6 text-slate-600 *:[a]:underline *:[a]:underline-offset-4 *:[a]:hover:text-slate-900",
+        "text-sm text-muted-foreground *:[a]:underline *:[a]:underline-offset-4 *:[a]:hover:text-foreground",
         className
       )}
       {...props}
@@ -159,7 +158,7 @@ function AlertDialogAction({
     <Button variant={variant} size={size} asChild>
       <AlertDialogPrimitive.Action
         data-slot="alert-dialog-action"
-        className={cn("min-w-[120px]", className)}
+        className={className}
         {...props}
       />
     </Button>
@@ -177,7 +176,7 @@ function AlertDialogCancel({
     <Button variant={variant} size={size} asChild>
       <AlertDialogPrimitive.Cancel
         data-slot="alert-dialog-cancel"
-        className={cn("min-w-[120px]", className)}
+        className={className}
         {...props}
       />
     </Button>
