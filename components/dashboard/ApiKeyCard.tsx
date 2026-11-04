@@ -68,16 +68,14 @@ export default function ApiKeyCard() {
         </div>
         <div className="ml-auto">
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
-              hasApiKey
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${hasApiKey
                 ? "border border-[rgba(34,197,94,0.16)] bg-[rgba(34,197,94,0.08)] text-[#16a34a]"
                 : "border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.56)] text-[#64748b]"
-            }`}
+              }`}
           >
             <span
-              className={`h-1.5 w-1.5 rounded-full ${
-                hasApiKey ? "bg-[#22c55e]" : "bg-[#64748b]"
-              }`}
+              className={`h-1.5 w-1.5 rounded-full ${hasApiKey ? "bg-[#22c55e]" : "bg-[#64748b]"
+                }`}
             />
             {hasApiKey ? "Active" : "Not generated"}
           </span>

@@ -153,13 +153,12 @@ export default function DocsPage() {
                   >
                     {ep.method && (
                       <span
-                        className={`w-12 text-left font-mono text-[0.65rem] font-semibold ${
-                          ep.method === "POST"
+                        className={`w-12 text-left font-mono text-[0.65rem] font-semibold ${ep.method === "POST"
                             ? "text-[#3b82f6]"
                             : ep.method === "GET"
                               ? "text-[#16a34a]"
                               : "text-[#ef4444]"
-                        }`}
+                          }`}
                       >
                         {ep.method}
                       </span>
