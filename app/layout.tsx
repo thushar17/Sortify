@@ -1,7 +1,21 @@
 import type { Metadata } from "next";
-import { Toaster } from "sonner";
+import { Geist, Geist_Mono } from "next/font/google";
+
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 import "./globals.css";
+
+const geistSans = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -9,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s | Sortify",
   },
   description:
-    "Modern URL shortening platform with analytics, QR codes, and developer APIs.",
+    "Short links with analytics, QR codes, password protection, and a REST API.",
 };
 
 export default function RootLayout({
@@ -18,10 +32,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
-      <body className="min-h-full antialiased relative">
-        <div className="relative flex min-h-full flex-col">{children}</div>
-        <Toaster closeButton position="top-right" />
+    <html
+      lang="en"
+      className={`h-full ${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="min-h-full">
+        {/* Light only until every screen is rebuilt on the new tokens (step 7 removes forcedTheme). */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          forcedTheme="light"
+        >
+          <TooltipProvider delayDuration={300}>
+            <div className="relative flex min-h-full flex-col">{children}</div>
+            <Toaster closeButton position="bottom-right" />
+          </TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
