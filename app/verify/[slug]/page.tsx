@@ -1,29 +1,31 @@
-import VerifyPasswordForm from "@/components/VerifyPasswordForm";
+import type { Metadata } from "next";
+
+import StatusPage from "@/components/marketing/status-page";
+import VerifyPasswordForm from "@/components/marketing/verify-password-form";
+import { getShortHost } from "@/lib/format";
+
+export const metadata: Metadata = {
+  title: "Password required",
+  robots: { index: false },
+};
+
 type Props = {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: Promise<{ slug: string }>;
 };
 
 export default async function VerifyPage({ params }: Props) {
   const { slug } = await params;
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="glass-card w-full max-w-md p-6">
-        <div className="mb-5">
-          <p className="eyebrow">Protected link</p>
-          <h1 className="mt-3 text-2xl font-semibold tracking-[-0.02em] text-[#0f172a]">
-            Protected Link
-          </h1>
-          <p className="mt-2 text-sm text-[#475569]">
-            Enter the password to continue to{" "}
-            <span className="font-mono text-[#4f46e5]">/{slug}</span>.
-          </p>
-        </div>
-
-        <VerifyPasswordForm slug={slug} />
-      </div>
-    </div>
+    <StatusPage
+      title="This link is password protected"
+      action={<VerifyPasswordForm slug={slug} />}
+    >
+      Enter the password for{" "}
+      <span className="font-mono text-foreground">
+        {getShortHost()}/{slug}
+      </span>{" "}
+      to continue. The person who shared it can tell you what it is.
+    </StatusPage>
   );
 }

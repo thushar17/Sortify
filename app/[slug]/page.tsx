@@ -1,8 +1,8 @@
-import { AlertCircle } from "lucide-react";
-import Link from "next/link";
 import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import StatusPage from "@/components/marketing/status-page";
 import { getBrowser, getDevice } from "@/lib/analytics";
+import { formatDateTime, getShortHost } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import type { Link as PrismaLink } from "@prisma/client";
@@ -47,56 +47,15 @@ export default async function PageRedirect({ params }: Props) {
       console.error("[prisma] DB lookup failed:", error);
       // DB is unavailable — show a friendly error instead of crashing
       return (
-        <main className="page-shell min-h-screen items-center justify-center">
-          <section className="glass-card section-shell w-full max-w-xl text-center">
-            <div className="space-y-4">
-              <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[#0f172a]">
-                Something went wrong
-              </h1>
-              <p className="text-[#475569]">
-                We couldn&apos;t process this link right now. Please try again in a moment.
-              </p>
-              <Link href="/" className="secondary-button">
-                Return Home
-              </Link>
-            </div>
-          </section>
-        </main>
+        <StatusPage code="503" title="Something went wrong">
+          We couldn&apos;t open this link right now. Try again in a moment.
+        </StatusPage>
       );
     }
   }
   // Link not found
   if (!link) {
-    return (
-      <main className="page-shell min-h-screen items-center justify-center">
-        <section className="glass-card section-shell w-full max-w-xl text-center">
-          <div className="relative flex flex-col items-center gap-5">
-            <div className="flex size-16 items-center justify-center rounded-[1.5rem] border border-[rgba(239,68,68,0.16)] bg-[rgba(239,68,68,0.08)] text-rose-600">
-              <AlertCircle className="size-7" />
-            </div>
-
-            <div className="space-y-2">
-              <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[#0f172a]">
-                Link not found
-              </h1>
-
-              <p className="text-sm leading-7 text-[#475569]">
-                The short link{" "}
-                <span className="font-mono font-semibold text-[#4f46e5]">/{slug}</span>{" "}
-                does not exist.
-              </p>
-            </div>
-
-            <Link
-              href="/"
-              className="secondary-button"
-            >
-              Return Home
-            </Link>
-          </div>
-        </section>
-      </main>
-    );
+    notFound();
   }
 
   const cookieStore = await cookies()
@@ -111,27 +70,13 @@ export default async function PageRedirect({ params }: Props) {
     link.expiresAt < new Date()
   ) {
     return (
-      <main className="page-shell min-h-screen items-center justify-center">
-        <section className="glass-card section-shell w-full max-w-xl text-center">
-          <div className="space-y-4">
-            <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[#0f172a]">
-              Link Expired
-            </h1>
-
-            <p className="text-[#475569]">
-              This short link has expired and is
-              no longer available.
-            </p>
-
-            <Link
-              href="/"
-              className="secondary-button"
-            >
-              Return Home
-            </Link>
-          </div>
-        </section>
-      </main>
+      <StatusPage code="410" title="This link has expired">
+        <span className="font-mono text-foreground">
+          {getShortHost()}/{slug}
+        </span>{" "}
+        stopped working on {formatDateTime(link.expiresAt)}. If you need it, ask the person who shared it for
+        a new one.
+      </StatusPage>
     );
   }
 

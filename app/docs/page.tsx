@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { CodeBlock, CodeGroup, type Snippet } from "@/components/docs/code-block";
+import { CodeBlock, CodeGroup } from "@/components/docs/code-block";
 import SiteHeader from "@/components/marketing/site-header";
+import { API_BASE_URL as BASE_URL, EXAMPLE_KEY as KEY, requestSnippets } from "@/lib/api-snippets";
 
 export const metadata: Metadata = {
   title: "API reference",
   description: "Create, list, analyze, and delete Sortify short links over HTTP.",
 };
-
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://sortify-url.vercel.app";
-const KEY = "sk_sortify_your_key";
 
 const nav = [
   {
@@ -37,55 +35,6 @@ const nav = [
     ],
   },
 ];
-
-function requestSnippets({
-  method,
-  path,
-  body,
-}: {
-  method: "GET" | "POST" | "DELETE";
-  path: string;
-  body?: Record<string, string>;
-}): Snippet[] {
-  const url = `${BASE_URL}${path}`;
-  const json = body ? JSON.stringify(body, null, 2) : null;
-
-  const curl = [
-    `curl${method === "GET" ? "" : ` -X ${method}`} ${url} \\`,
-    `  -H "x-api-key: ${KEY}"${json ? " \\" : ""}`,
-    ...(json ? [`  -H "Content-Type: application/json" \\`, `  -d '${json.replace(/\n/g, "\n  ")}'`] : []),
-  ].join("\n");
-
-  const js = [
-    `const res = await fetch("${url}", {`,
-    ...(method === "GET" ? [] : [`  method: "${method}",`]),
-    `  headers: {`,
-    `    "x-api-key": process.env.SORTIFY_API_KEY,`,
-    ...(json ? [`    "Content-Type": "application/json",`] : []),
-    `  },`,
-    ...(json ? [`  body: JSON.stringify(${json.replace(/\n/g, "\n  ")}),`] : []),
-    `});`,
-    ``,
-    `const data = await res.json();`,
-  ].join("\n");
-
-  const python = [
-    `import os, requests`,
-    ``,
-    `res = requests.${method.toLowerCase()}(`,
-    `    "${url}",`,
-    `    headers={"x-api-key": os.environ["SORTIFY_API_KEY"]},`,
-    ...(json ? [`    json=${json.replace(/\n/g, "\n    ")},`] : []),
-    `)`,
-    `data = res.json()`,
-  ].join("\n");
-
-  return [
-    { label: "cURL", lang: "bash", code: curl },
-    { label: "JavaScript", lang: "javascript", code: js },
-    { label: "Python", lang: "python", code: python },
-  ];
-}
 
 function Endpoint({ method, path }: { method: string; path: string }) {
   return (
