@@ -24,6 +24,22 @@ export const getAuthenticatedDashboardContext = cache(async () => {
   return { session, user };
 });
 
+export const getUserLinkIndex = cache(async (userId: string) => {
+  return prisma.link.findMany({
+    where: {
+      userId,
+    },
+    select: {
+      slug: true,
+      originalUrl: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 200,
+  });
+});
+
 export const getUserLinksWithClicks = cache(async (userId: string) => {
   return prisma.link.findMany({
     where: {
