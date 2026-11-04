@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint && bash scripts/check-ui.sh",
     "prisma:generate": "prisma generate",
     "postinstall": "prisma generate",
     "lint:ui": "bash scripts/check-ui.sh"

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Link2, Plus, Search } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Link2, Monitor, Moon, Plus, Search, Sun } from "lucide-react";
 
 import { accountNav, primaryNav } from "@/components/app/nav";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ function getHost(url: string) {
 export default function CommandMenu({ links }: { links: CommandLink[] }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const { setTheme } = useTheme();
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -106,6 +108,21 @@ export default function CommandMenu({ links }: { links: CommandLink[] }) {
               </CommandGroup>
             </>
           )}
+          <CommandSeparator />
+          <CommandGroup heading="Theme">
+            <CommandItem onSelect={() => { setTheme("light"); setOpen(false); }}>
+              <Sun />
+              Light theme
+            </CommandItem>
+            <CommandItem onSelect={() => { setTheme("dark"); setOpen(false); }}>
+              <Moon />
+              Dark theme
+            </CommandItem>
+            <CommandItem onSelect={() => { setTheme("system"); setOpen(false); }}>
+              <Monitor />
+              System theme
+            </CommandItem>
+          </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading="Go to">
             {[...primaryNav, ...accountNav].map((item) => {

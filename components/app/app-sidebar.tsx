@@ -7,6 +7,7 @@ import { ChevronsUpDown, LogOut } from "lucide-react";
 
 import { Logo } from "@/components/app/logo";
 import { accountNav, isNavActive, primaryNav } from "@/components/app/nav";
+import ThemeToggle from "@/components/app/theme-toggle";
 import UserAvatar from "@/components/dashboard/UserAvatar";
 import {
   DropdownMenu,
@@ -72,6 +73,11 @@ export function UserMenu({ user }: { user: SidebarUser }) {
         <DropdownMenuLabel className="truncate font-normal text-muted-foreground">
           {user.email}
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <div className="flex items-center justify-between px-2 py-1 text-sm">
+          Theme
+          <ThemeToggle />
+        </div>
         <DropdownMenuSeparator />
         {accountNav.map((item) => {
           const Icon = item.icon;

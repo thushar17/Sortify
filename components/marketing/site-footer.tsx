@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Logo } from "@/components/app/logo";
+import ThemeToggle from "@/components/app/theme-toggle";
 
 export default function SiteFooter() {
   return (
@@ -10,17 +11,20 @@ export default function SiteFooter() {
           <Logo />
           <span>© {new Date().getFullYear()}</span>
         </div>
-        <nav className="flex gap-5">
-          <Link href="/docs" className="hover:text-foreground">
-            API docs
-          </Link>
-          <a href="https://github.com/thushar17/Sortify" target="_blank" rel="noreferrer" className="hover:text-foreground">
-            GitHub
-          </a>
-          <Link href="/sign-in" className="hover:text-foreground">
-            Sign in
-          </Link>
-        </nav>
+        <div className="flex items-center gap-5">
+          <nav className="flex gap-5">
+            <Link href="/docs" className="hover:text-foreground">
+              API docs
+            </Link>
+            <a href="https://github.com/thushar17/Sortify" target="_blank" rel="noreferrer" className="hover:text-foreground">
+              GitHub
+            </a>
+            <Link href="/sign-in" className="hover:text-foreground">
+              Sign in
+            </Link>
+          </nav>
+          <ThemeToggle />
+        </div>
       </div>
     </footer>
   );

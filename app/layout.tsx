@@ -38,14 +38,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full">
-        {/* Light only until every screen is rebuilt on the new tokens (step 7 removes forcedTheme). */}
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-          forcedTheme="light"
-        >
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <TooltipProvider delayDuration={300}>
             <div className="relative flex min-h-full flex-col">{children}</div>
             <Toaster closeButton position="bottom-right" />

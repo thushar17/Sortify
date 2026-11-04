@@ -159,95 +159,6 @@
   }
 }
 
-/* ─── Legacy classes ───────────────────────────────── */
-/* Flat stand-ins for the old glass styles. Each page drops these as it is rebuilt. */
-
-@layer components {
-  .page-shell {
-    @apply flex min-h-screen flex-col gap-4 p-6;
-  }
-
-  .section-shell {
-    @apply p-6;
-  }
-
-  .glass-card,
-  .dark-card,
-  .light-card {
-    @apply rounded-lg border bg-card text-card-foreground;
-  }
-
-  .surface-muted {
-    @apply rounded-md border bg-muted;
-  }
-
-  .subtle-divider {
-    @apply h-px w-full bg-border;
-  }
-
-  .empty-state-orb {
-    @apply inline-flex size-10 items-center justify-center rounded-md border bg-muted text-muted-foreground;
-  }
-
-  .eyebrow {
-    @apply inline-flex items-center gap-2 text-xs font-medium text-muted-foreground;
-  }
-
-  .gradient-text {
-    @apply text-foreground;
-  }
-
-  .field-label {
-    @apply mb-1.5 block text-xs font-medium text-foreground;
-  }
-
-  .field-input {
-    @apply h-9 w-full rounded-md border border-input bg-card px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring;
-  }
-
-  .primary-button,
-  .secondary-button {
-    @apply inline-flex h-9 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md border px-3.5 text-sm font-medium no-underline transition-colors;
-  }
-
-  .primary-button {
-    @apply border-transparent bg-primary text-primary-foreground hover:bg-primary/90;
-  }
-
-  .secondary-button {
-    @apply border-input bg-card text-foreground hover:bg-muted;
-  }
-
-  .action-button,
-  .danger-button {
-    @apply inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-transparent text-muted-foreground transition-colors;
-  }
-
-  .action-button {
-    @apply hover:bg-muted hover:text-foreground;
-  }
-
-  .danger-button {
-    @apply hover:bg-destructive/10 hover:text-destructive;
-  }
-
-  .sidebar-link {
-    @apply flex h-8 items-center gap-2.5 rounded-md px-2.5 text-sm text-muted-foreground no-underline transition-colors hover:bg-muted hover:text-foreground;
-  }
-
-  .sidebar-link-active {
-    @apply bg-muted font-medium text-foreground;
-  }
-
-  .metric-card {
-    @apply p-5;
-  }
-
-  .code-block {
-    @apply overflow-x-auto rounded-md border bg-muted px-4 py-3 font-mono text-[13px] leading-relaxed text-foreground;
-  }
-}
-
 /* Shiki output: tokens carry their own colors; the frame comes from the surrounding card. */
 .code-html pre {
   @apply m-0 overflow-x-auto bg-transparent! px-4 py-3 font-mono text-[13px] leading-relaxed;
@@ -256,10 +167,4 @@
 .dark .code-html .shiki,
 .dark .code-html .shiki span {
   color: var(--shiki-dark) !important;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
 }

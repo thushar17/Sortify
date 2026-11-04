@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import PageHeader from "@/components/app/page-header";
 import SignOutButton from "@/components/app/sign-out-button";
+import ThemeToggle from "@/components/app/theme-toggle";
 import UserAvatar from "@/components/dashboard/UserAvatar";
 import { getAuthenticatedDashboardContext } from "@/lib/dashboard";
 import { formatNumber } from "@/lib/format";
@@ -75,6 +76,9 @@ export default async function ProfilePage() {
               Manage
             </Link>
           </div>
+        </Row>
+        <Row label="Appearance" description="System follows your device setting.">
+          <ThemeToggle />
         </Row>
         <Row label="Session" description="Sign out of Sortify on this device.">
           <SignOutButton />
