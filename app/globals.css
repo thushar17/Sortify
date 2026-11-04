@@ -248,6 +248,16 @@
   }
 }
 
+/* Shiki output: tokens carry their own colors; the frame comes from the surrounding card. */
+.code-html pre {
+  @apply m-0 overflow-x-auto bg-transparent! px-4 py-3 font-mono text-[13px] leading-relaxed;
+}
+
+.dark .code-html .shiki,
+.dark .code-html .shiki span {
+  color: var(--shiki-dark) !important;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

@@ -1,46 +1,56 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
-import ApiKeyCard from "@/components/dashboard/ApiKeyCard";
+import ApiKeyManager from "@/components/app/api-key-manager";
+import PageHeader from "@/components/app/page-header";
+import { CodeBlock } from "@/components/docs/code-block";
+import { getAuthenticatedDashboardContext } from "@/lib/dashboard";
 
-export default function ApiKeysPage() {
+export const metadata: Metadata = {
+  title: "API keys",
+};
+
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://sortify-url.vercel.app";
+
+export default async function ApiKeysPage() {
+  const { user } = await getAuthenticatedDashboardContext();
+
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-[#0f172a]">
-          API Keys
-        </h1>
-        <p className="text-sm text-[#475569]">
-          Generate and manage your API keys for programmatic access.
-        </p>
-      </div>
+    <>
+      <PageHeader title="API keys" description="Create and manage links from your own code." />
 
-      <ApiKeyCard />
+      <section className="rounded-lg border bg-card">
+        <header className="border-b px-4 py-3">
+          <h2 className="text-sm font-medium">Secret key</h2>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">
+            One key per account. Regenerating it revokes the old one.
+          </p>
+        </header>
+        <ApiKeyManager prefix={user.apiKeyHash ? user.apiKeyPrefix : null} />
+      </section>
 
-      <div className="glass-card p-5">
-        <h2 className="mb-3 text-sm font-semibold text-[#0f172a]">
-          How to use your API key
-        </h2>
-        <p className="mb-3 text-sm text-[#475569]">
-          Include the key in every request using the{" "}
-          <code className="rounded border border-[rgba(148,163,184,0.18)] bg-[rgba(255,255,255,0.7)] px-1.5 py-0.5 font-mono text-xs text-[#4f46e5]">
-            x-api-key
-          </code>{" "}
-          header.
-        </p>
-        <pre className="code-block text-sm">
-          {`curl -X POST https://your-domain.com/api/v1/links \\
-  -H "x-api-key: sk_sortify_xxxx" \\
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:items-start">
+        <div>
+          <h2 className="text-sm font-medium">Quick start</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Send the key in the <code className="font-mono text-[13px] text-foreground">x-api-key</code> header.
+            This request creates a short link and returns its URL.
+          </p>
+          <p className="mt-3 text-sm">
+            <Link href="/docs" className="underline underline-offset-4">
+              Read the API reference
+            </Link>
+          </p>
+        </div>
+        <CodeBlock
+          title="cURL"
+          lang="bash"
+          code={`curl -X POST ${BASE_URL}/api/v1/links \\
+  -H "x-api-key: $SORTIFY_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"url": "https://example.com"}'`}
-        </pre>
-        <p className="mt-3 text-xs text-[#64748b]">
-          See the{" "}
-          <Link href="/docs" className="text-[#4f46e5] hover:underline">
-            full API documentation
-          </Link>{" "}
-          for all available endpoints.
-        </p>
-      </div>
-    </div>
+        />
+      </section>
+    </>
   );
 }

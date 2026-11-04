@@ -1,97 +1,85 @@
-import { KeyRound, Mail } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 
+import PageHeader from "@/components/app/page-header";
+import SignOutButton from "@/components/app/sign-out-button";
 import UserAvatar from "@/components/dashboard/UserAvatar";
-import {
-  getAuthenticatedDashboardContext,
-  getUserLinksWithClicks,
-  formatDashboardLinks,
-  getLinkMetrics,
-} from "@/lib/dashboard";
+import { getAuthenticatedDashboardContext } from "@/lib/dashboard";
+import { formatNumber } from "@/lib/format";
+import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = {
+  title: "Profile",
+};
+
+function Row({ label, description, children }: { label: string; description?: string; children: React.ReactNode }) {
+  return (
+    <div className="grid gap-3 px-4 py-4 sm:grid-cols-[220px_minmax(0,1fr)] sm:gap-6">
+      <div>
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        {description && <p className="mt-0.5 text-[13px] text-muted-foreground">{description}</p>}
+      </div>
+      <div className="min-w-0 text-sm">{children}</div>
+    </div>
+  );
+}
 
 export default async function ProfilePage() {
   const { session, user } = await getAuthenticatedDashboardContext();
-  const dbLinks = await getUserLinksWithClicks(user.id);
-  const links = formatDashboardLinks(dbLinks);
-  const { totalLinks } = getLinkMetrics(dbLinks);
-  const totalClicks = links.reduce((sum, link) => sum + link.totalClicks, 0);
+  const [linkCount, clickCount] = await Promise.all([
+    prisma.link.count({ where: { userId: user.id } }),
+    prisma.click.count({ where: { link: { userId: user.id } } }),
+  ]);
 
-  const displayName = session.user?.name || "User";
-  const displayEmail = session.user?.email || user.email;
+  const name = session.user?.name;
+  const email = session.user?.email || user.email;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-[#0f172a]">
-          Profile
-        </h1>
-        <p className="text-sm text-[#475569]">
-          Your account information and workspace stats.
-        </p>
-      </div>
+    <>
+      <PageHeader title="Profile" description="Your account and usage." />
 
-      <div className="glass-card p-6">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">
-          <UserAvatar
-            name={session.user?.name}
-            email={displayEmail}
-            image={session.user?.image}
-            className="h-16 w-16 flex-shrink-0 rounded-xl text-lg shadow-sm"
-          />
-
-          <div className="flex-1">
-            <h2 className="text-lg font-semibold text-[#0f172a]">
-              {displayName}
-            </h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="flex items-center gap-3 rounded-2xl border border-[rgba(255,255,255,0.78)] bg-[rgba(255,255,255,0.6)] px-4 py-3 shadow-[0_8px_18px_rgba(15,23,42,0.04)]">
-                <Mail className="size-4 flex-shrink-0 text-[#64748b]" />
-                <div className="min-w-0">
-                  <p className="text-xs font-medium text-[#64748b]">Email</p>
-                  <p className="truncate text-sm font-medium text-[#0f172a]">
-                    {displayEmail}
-                  </p>
-                </div>
-              </div>
+      <section className="divide-y rounded-lg border bg-card">
+        <Row label="Account" description="Managed by your Google account.">
+          <div className="flex items-center gap-3">
+            <UserAvatar name={name} email={email} image={session.user?.image} className="size-10" />
+            <div className="min-w-0">
+              <p className="truncate font-medium text-foreground">{name || "—"}</p>
+              <p className="truncate text-muted-foreground">{email}</p>
             </div>
           </div>
-        </div>
-
-        <div className="mt-6 grid grid-cols-2 gap-4 border-t border-[rgba(148,163,184,0.18)] pt-6">
-          <div>
-            <p className="text-[1.75rem] font-semibold tracking-[-0.03em] text-[#0f172a]">
-              {totalLinks}
+        </Row>
+        <Row label="Usage">
+          <dl className="flex gap-10">
+            <div>
+              <dt className="text-[13px] text-muted-foreground">Links</dt>
+              <dd className="mt-0.5 font-mono text-lg tabular-nums">{formatNumber(linkCount)}</dd>
+            </div>
+            <div>
+              <dt className="text-[13px] text-muted-foreground">Clicks, all time</dt>
+              <dd className="mt-0.5 font-mono text-lg tabular-nums">{formatNumber(clickCount)}</dd>
+            </div>
+          </dl>
+        </Row>
+        <Row label="API access">
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-muted-foreground">
+              {user.apiKeyHash ? (
+                <>
+                  Key <span className="font-mono text-foreground">sk_sortify_{user.apiKeyPrefix}…</span> is active.
+                </>
+              ) : (
+                "No API key yet."
+              )}
             </p>
-            <p className="mt-1 text-sm font-medium text-[#475569]">Total links</p>
+            <Link href="/dashboard/api-keys" className="shrink-0 underline underline-offset-4">
+              Manage
+            </Link>
           </div>
-          <div>
-            <p className="text-[1.75rem] font-semibold tracking-[-0.03em] text-[#0f172a]">
-              {totalClicks}
-            </p>
-            <p className="mt-1 text-sm font-medium text-[#475569]">Total clicks</p>
-          </div>
-        </div>
-      </div>
-
-      <Link
-        href="/dashboard/api-keys"
-        className="group glass-card flex items-center justify-between p-6 transition-colors hover:bg-[rgba(255,255,255,0.9)]"
-      >
-        <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[rgba(59,130,246,0.1)]">
-            <KeyRound className="size-5 text-[#3b82f6]" />
-          </div>
-          <div>
-            <p className="text-base font-semibold text-[#0f172a]">API Keys</p>
-            <p className="text-sm text-[#475569]">
-              Manage programmatic access to Sortify
-            </p>
-          </div>
-        </div>
-        <div className="text-[#64748b] transition-transform group-hover:translate-x-1">
-          →
-        </div>
-      </Link>
-    </div>
+        </Row>
+        <Row label="Session" description="Sign out of Sortify on this device.">
+          <SignOutButton />
+        </Row>
+      </section>
+    </>
   );
 }

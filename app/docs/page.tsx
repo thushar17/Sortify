@@ -1,273 +1,391 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BarChart3, KeyRound, Link2, Trash2 } from "lucide-react";
-import { Metadata } from "next";
+
+import { CodeBlock, CodeGroup, type Snippet } from "@/components/docs/code-block";
+import SiteHeader from "@/components/marketing/site-header";
 
 export const metadata: Metadata = {
-  title: "API Docs | Sortify",
-  description:
-    "Sortify REST API documentation — create, manage, and analyze short links programmatically.",
+  title: "API reference",
+  description: "Create, list, analyze, and delete Sortify short links over HTTP.",
 };
 
-const endpoints = [
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://sortify-url.vercel.app";
+const KEY = "sk_sortify_your_key";
+
+const nav = [
   {
-    id: "authentication",
-    method: null,
-    title: "Authentication",
-    icon: KeyRound,
-    iconColor: "text-[#3b82f6]",
-    description:
-      "Include your API key in every request using the x-api-key header.",
-    request: `x-api-key: sk_sortify_xxxxxxxxxxxxxxxxx`,
-    response: null,
+    title: "Getting started",
+    items: [
+      { id: "introduction", label: "Introduction" },
+      { id: "authentication", label: "Authentication" },
+    ],
   },
   {
-    id: "create-link",
-    method: "POST",
-    title: "Create Link",
-    icon: Link2,
-    iconColor: "text-[#3b82f6]",
-    endpoint: "POST /api/v1/links",
-    description:
-      "Create a new short link. Optionally provide a custom slug, expiry date, and password.",
-    request: `{
-  "url": "https://example.com/very-long-url",
-  "slug": "my-link",            // optional
-  "expiresAt": "2025-12-31",   // optional ISO date
-  "password": "secret"          // optional
-}`,
-    response: `{
-  "success": true,
-  "shortUrl": "https://your-domain.com/my-link"
-}`,
+    title: "Endpoints",
+    items: [
+      { id: "create-link", label: "Create a link", method: "POST" },
+      { id: "list-links", label: "List links", method: "GET" },
+      { id: "link-analytics", label: "Link analytics", method: "GET" },
+      { id: "delete-link", label: "Delete a link", method: "DEL" },
+    ],
   },
   {
-    id: "get-links",
-    method: "GET",
-    title: "Get All Links",
-    icon: Link2,
-    iconColor: "text-[#22c55e]",
-    endpoint: "GET /api/v1/links",
-    description: "Retrieve all short links associated with your API key.",
-    request: null,
-    response: `{
-  "links": [
-    {
-      "id": "clxyz...",
-      "slug": "my-link",
-      "originalUrl": "https://example.com/very-long-url",
-      "clicks": 42,
-      "createdAt": "2024-01-15T10:30:00Z"
-    }
-  ]
-}`,
-  },
-  {
-    id: "analytics",
-    method: "GET",
-    title: "Analytics",
-    icon: BarChart3,
-    iconColor: "text-[#8b5cf6]",
-    endpoint: "GET /api/v1/analytics/:slug",
-    description:
-      "Get detailed analytics for a short link — total clicks, browser breakdown, device breakdown, countries, and a click timeline.",
-    request: null,
-    response: `{
-  "slug": "my-link",
-  "totalClicks": 42,
-  "browsers": { "Chrome": 30, "Firefox": 8, "Safari": 4 },
-  "devices": { "Desktop": 35, "Mobile": 7 },
-  "countries": { "United States": 20, "India": 12 },
-  "clicksByDay": [
-    { "date": "2024-01-15", "clicks": 10 },
-    { "date": "2024-01-16", "clicks": 32 }
-  ]
-}`,
-  },
-  {
-    id: "delete-link",
-    method: "DELETE",
-    title: "Delete Link",
-    icon: Trash2,
-    iconColor: "text-[#ef4444]",
-    endpoint: "DELETE /api/v1/links/:slug",
-    description: "Permanently delete a short link and all its analytics data.",
-    request: null,
-    response: `{
-  "success": true
-}`,
+    title: "Reference",
+    items: [
+      { id: "errors", label: "Errors" },
+      { id: "rate-limits", label: "Rate limits" },
+    ],
   },
 ];
 
-function MethodBadge({ method }: { method: string }) {
-  const cls =
-    method === "POST"
-      ? "border border-[rgba(59,130,246,0.18)] bg-[rgba(59,130,246,0.1)] px-2 py-0.5 rounded-full font-mono text-[0.65rem] font-semibold text-[#3b82f6]"
-      : method === "GET"
-        ? "border border-[rgba(34,197,94,0.18)] bg-[rgba(34,197,94,0.1)] px-2 py-0.5 rounded-full font-mono text-[0.65rem] font-semibold text-[#16a34a]"
-        : method === "DELETE"
-          ? "border border-[rgba(239,68,68,0.18)] bg-[rgba(239,68,68,0.1)] px-2 py-0.5 rounded-full font-mono text-[0.65rem] font-semibold text-[#ef4444]"
-          : "border border-[rgba(148,163,184,0.18)] bg-[rgba(255,255,255,0.56)] px-2 py-0.5 rounded-full font-mono text-[0.65rem] font-semibold text-[#475569]";
-  return <span className={cls}>{method}</span>;
+function requestSnippets({
+  method,
+  path,
+  body,
+}: {
+  method: "GET" | "POST" | "DELETE";
+  path: string;
+  body?: Record<string, string>;
+}): Snippet[] {
+  const url = `${BASE_URL}${path}`;
+  const json = body ? JSON.stringify(body, null, 2) : null;
+
+  const curl = [
+    `curl${method === "GET" ? "" : ` -X ${method}`} ${url} \\`,
+    `  -H "x-api-key: ${KEY}"${json ? " \\" : ""}`,
+    ...(json ? [`  -H "Content-Type: application/json" \\`, `  -d '${json.replace(/\n/g, "\n  ")}'`] : []),
+  ].join("\n");
+
+  const js = [
+    `const res = await fetch("${url}", {`,
+    ...(method === "GET" ? [] : [`  method: "${method}",`]),
+    `  headers: {`,
+    `    "x-api-key": process.env.SORTIFY_API_KEY,`,
+    ...(json ? [`    "Content-Type": "application/json",`] : []),
+    `  },`,
+    ...(json ? [`  body: JSON.stringify(${json.replace(/\n/g, "\n  ")}),`] : []),
+    `});`,
+    ``,
+    `const data = await res.json();`,
+  ].join("\n");
+
+  const python = [
+    `import os, requests`,
+    ``,
+    `res = requests.${method.toLowerCase()}(`,
+    `    "${url}",`,
+    `    headers={"x-api-key": os.environ["SORTIFY_API_KEY"]},`,
+    ...(json ? [`    json=${json.replace(/\n/g, "\n    ")},`] : []),
+    `)`,
+    `data = res.json()`,
+  ].join("\n");
+
+  return [
+    { label: "cURL", lang: "bash", code: curl },
+    { label: "JavaScript", lang: "javascript", code: js },
+    { label: "Python", lang: "python", code: python },
+  ];
+}
+
+function Endpoint({ method, path }: { method: string; path: string }) {
+  return (
+    <p className="mt-2 inline-flex items-center gap-2 rounded-md border bg-muted px-2 py-1 font-mono text-[13px]">
+      <span className="font-medium text-foreground">{method}</span>
+      <span className="text-muted-foreground">{path}</span>
+    </p>
+  );
+}
+
+function Params({ rows }: { rows: { name: string; type: string; required?: boolean; description: React.ReactNode }[] }) {
+  return (
+    <div className="mt-6">
+      <h3 className="text-sm font-medium text-foreground">Body parameters</h3>
+      <dl className="mt-2 divide-y border-y">
+        {rows.map((row) => (
+          <div key={row.name} className="py-3">
+            <dt className="flex items-baseline gap-2">
+              <code className="font-mono text-[13px] font-medium text-foreground">{row.name}</code>
+              <span className="font-mono text-xs text-muted-foreground">{row.type}</span>
+              {row.required && <span className="text-xs text-warning">required</span>}
+            </dt>
+            <dd className="mt-1 text-sm text-muted-foreground">{row.description}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+function Section({
+  id,
+  title,
+  children,
+  code,
+}: {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+  code?: React.ReactNode;
+}) {
+  return (
+    <section id={id} className="scroll-mt-20 border-t py-10 first:border-t-0 first:pt-0">
+      <div className="grid gap-6 xl:grid-cols-2 xl:gap-10">
+        <div className="min-w-0 max-w-prose">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">{title}</h2>
+          <div className="mt-2 space-y-3 text-sm leading-6 text-muted-foreground [&_code]:font-mono [&_code]:text-[13px] [&_code]:text-foreground">
+            {children}
+          </div>
+        </div>
+        {code && <div className="min-w-0 space-y-3 xl:sticky xl:top-20 xl:self-start">{code}</div>}
+      </div>
+    </section>
+  );
 }
 
 export default function DocsPage() {
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-50 border-b border-[rgba(148,163,184,0.18)] bg-[rgba(255,255,255,0.72)] backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex size-8 items-center justify-center rounded-xl border border-white/80 bg-gradient-to-br from-[#3b82f6] to-[#8b5cf6] text-sm font-semibold text-white shadow-[0_10px_22px_rgba(59,130,246,0.18)]">
-              S
-            </div>
-            <span className="text-sm font-semibold tracking-tight text-[#0f172a]">
-              Sortify
-            </span>
-          </Link>
-          <nav className="flex items-center gap-4">
-            <Link
-              href="/dashboard"
-              className="text-sm font-medium text-[#475569] transition-colors hover:text-[#0f172a]"
-            >
-              Dashboard
-            </Link>
-            <Link href="/sign-in" className="primary-button h-9 px-4 text-xs">
-              Sign in
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
-          <aside className="hidden lg:block">
-            <div className="sticky top-24 glass-card p-4">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                Endpoints
-              </p>
-              <nav className="flex flex-col gap-1">
-                {endpoints.map((ep) => (
-                  <a
-                    key={ep.id}
-                    href={`#${ep.id}`}
-                    className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-[#475569] transition-colors hover:bg-[rgba(79,70,229,0.08)] hover:text-[#0f172a]"
-                  >
-                    {ep.method && (
-                      <span
-                        className={`w-12 text-left font-mono text-[0.65rem] font-semibold ${ep.method === "POST"
-                            ? "text-[#3b82f6]"
-                            : ep.method === "GET"
-                              ? "text-[#16a34a]"
-                              : "text-[#ef4444]"
-                          }`}
+      <SiteHeader wide />
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[180px_minmax(0,1fr)]">
+        <aside className="hidden lg:block">
+          <nav className="sticky top-24 space-y-6 text-sm">
+            {nav.map((group) => (
+              <div key={group.title}>
+                <p className="mb-2 text-xs font-medium text-foreground">{group.title}</p>
+                <ul className="space-y-0.5 border-l">
+                  {group.items.map((item) => (
+                    <li key={item.id}>
+                      <a
+                        href={`#${item.id}`}
+                        className="-ml-px flex items-center justify-between border-l border-transparent py-1 pl-3 text-muted-foreground hover:border-border-strong hover:text-foreground"
                       >
-                        {ep.method}
-                      </span>
-                    )}
-                    <span className="truncate">{ep.title}</span>
-                  </a>
-                ))}
-              </nav>
-            </div>
-          </aside>
-
-          <main className="flex min-w-0 flex-1 flex-col gap-6">
-            <section className="glass-card p-6 sm:p-8">
-              <span className="eyebrow">REST API</span>
-              <h1 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-[#0f172a] sm:text-5xl">
-                Sortify API Reference
-              </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-[#475569]">
-                Create, manage, and analyze short links programmatically using API
-                keys generated from your dashboard.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link
-                  href="/dashboard/api-keys"
-                  className="primary-button h-10 px-5 text-sm"
-                >
-                  Generate API Key
-                  <ArrowRight className="size-4" />
-                </Link>
-                <Link href="/dashboard" className="secondary-button h-10 px-5 text-sm">
-                  Open Dashboard
-                </Link>
+                        {item.label}
+                        {"method" in item && (
+                          <span className="font-mono text-[10px] text-muted-foreground">{item.method}</span>
+                        )}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </section>
+            ))}
+          </nav>
+        </aside>
 
-            <div className="glass-card px-5 py-4">
-              <p className="mb-1 text-xs font-medium text-[#64748b]">Base URL</p>
-              <code className="font-mono text-sm font-semibold text-[#4f46e5]">
-                https://your-domain.com
-              </code>
-            </div>
+        <main className="min-w-0">
+          <Section
+            id="introduction"
+            title="API reference"
+            code={<CodeBlock title="Base URL" lang="text" code={BASE_URL} />}
+          >
+            <p>
+              The Sortify API lets you create short links, list them, read their click data, and delete
+              them from your own code. Requests and responses are JSON over HTTPS.
+            </p>
+            <p>
+              Everything here uses the same account as the dashboard. Links created through the API show
+              up in your dashboard, and the other way around.
+            </p>
+          </Section>
 
-            {endpoints.map((ep) => {
-              const Icon = ep.icon;
-              return (
-                <section
-                  id={ep.id}
-                  key={ep.id}
-                  className="glass-card overflow-hidden scroll-mt-24"
-                >
-                  <div className="flex flex-col gap-3 border-b border-[rgba(148,163,184,0.18)] bg-[rgba(255,255,255,0.36)] px-5 py-5 sm:flex-row sm:items-center">
-                    <div className="flex items-center gap-3">
-                      <Icon className={`size-5 ${ep.iconColor}`} />
-                      <h2 className="text-lg font-semibold text-[#0f172a]">
-                        {ep.title}
-                      </h2>
-                      {ep.method && <MethodBadge method={ep.method} />}
-                    </div>
-                    {ep.endpoint && (
-                      <code className="rounded-xl border border-[rgba(255,255,255,0.78)] bg-[rgba(255,255,255,0.68)] px-2.5 py-1 font-mono text-xs font-semibold text-[#64748b] sm:ml-auto">
-                        {ep.endpoint}
-                      </code>
-                    )}
-                  </div>
+          <Section
+            id="authentication"
+            title="Authentication"
+            code={<CodeBlock title="Header" lang="http" code={`x-api-key: ${KEY}`} />}
+          >
+            <p>
+              Send your API key in the <code>x-api-key</code> header on every request. Create one on the{" "}
+              <Link href="/dashboard/api-keys" className="text-foreground underline underline-offset-4">
+                API keys
+              </Link>{" "}
+              page.
+            </p>
+            <p>
+              Each account has one key. It&apos;s shown once when you create it; after that only its first
+              characters are visible. Generating a new key revokes the old one immediately.
+            </p>
+            <p>
+              Requests without a valid key get a <code>401</code>. Keep keys on your server and out of
+              browser code.
+            </p>
+          </Section>
 
-                  <div className="space-y-5 p-5 sm:p-6">
-                    <p className="text-sm leading-7 text-[#475569] sm:text-base">
-                      {ep.description}
-                    </p>
+          <Section
+            id="create-link"
+            title="Create a link"
+            code={
+              <>
+                <CodeGroup
+                  snippets={requestSnippets({
+                    method: "POST",
+                    path: "/api/v1/links",
+                    body: { url: "https://example.com/launch-notes", slug: "launch" },
+                  })}
+                />
+                <CodeBlock
+                  title="Response · 200"
+                  lang="json"
+                  code={JSON.stringify({ success: true, shortUrl: `${BASE_URL}/launch` }, null, 2)}
+                />
+              </>
+            }
+          >
+            <Endpoint method="POST" path="/api/v1/links" />
+            <p>Creates a short link and returns its full URL.</p>
+            <Params
+              rows={[
+                {
+                  name: "url",
+                  type: "string",
+                  required: true,
+                  description: "The destination. Must be a full URL including https://.",
+                },
+                {
+                  name: "slug",
+                  type: "string",
+                  description:
+                    "Custom path for the short link. 3–30 characters: letters, numbers, - and _. Omit it for a random 6-character slug.",
+                },
+              ]}
+            />
+            <p className="pt-2">
+              Expiry dates and passwords can be set from the dashboard; the API ignores them for now.
+            </p>
+          </Section>
 
-                    {ep.request && (
-                      <div>
-                        <p className="mb-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                          {ep.id === "authentication" ? "Header" : "Request body"}
-                        </p>
-                        <pre className="code-block">{ep.request}</pre>
-                      </div>
-                    )}
+          <Section
+            id="list-links"
+            title="List links"
+            code={
+              <>
+                <CodeGroup snippets={requestSnippets({ method: "GET", path: "/api/v1/links" })} />
+                <CodeBlock
+                  title="Response · 200"
+                  lang="json"
+                  code={JSON.stringify(
+                    {
+                      links: [
+                        {
+                          id: "cm3k2x9ab0001",
+                          slug: "launch",
+                          originalUrl: "https://example.com/launch-notes",
+                          click: 42,
+                          createdAt: "2026-11-02T09:30:00.000Z",
+                        },
+                      ],
+                    },
+                    null,
+                    2
+                  )}
+                />
+              </>
+            }
+          >
+            <Endpoint method="GET" path="/api/v1/links" />
+            <p>Returns every link on your account, newest first.</p>
+            <p>
+              Each link includes <code>click</code>, the total number of recorded clicks.
+            </p>
+          </Section>
 
-                    {ep.response && (
-                      <div>
-                        <p className="mb-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                          Response
-                        </p>
-                        <pre className="code-block">{ep.response}</pre>
-                      </div>
-                    )}
-                  </div>
-                </section>
-              );
-            })}
+          <Section
+            id="link-analytics"
+            title="Link analytics"
+            code={
+              <>
+                <CodeGroup snippets={requestSnippets({ method: "GET", path: "/api/v1/analytics/launch" })} />
+                <CodeBlock
+                  title="Response · 200"
+                  lang="json"
+                  code={JSON.stringify(
+                    {
+                      slug: "launch",
+                      originalUrl: "https://example.com/launch-notes",
+                      totalClicks: 2,
+                      clicks: [
+                        {
+                          id: "cm3k3a1cd0004",
+                          linkId: "cm3k2x9ab0001",
+                          browser: "Chrome",
+                          device: "Desktop",
+                          country: "India",
+                          createdAt: "2026-11-03T14:12:08.000Z",
+                        },
+                        {
+                          id: "cm3k3b7ef0007",
+                          linkId: "cm3k2x9ab0001",
+                          browser: "Safari",
+                          device: "Mobile",
+                          country: "Germany",
+                          createdAt: "2026-11-03T16:40:51.000Z",
+                        },
+                      ],
+                    },
+                    null,
+                    2
+                  )}
+                />
+              </>
+            }
+          >
+            <Endpoint method="GET" path="/api/v1/analytics/:slug" />
+            <p>
+              Returns every recorded click for one of your links, with the browser, device type, and country
+              of each visit.
+            </p>
+            <p>
+              Returns <code>404</code> if the slug doesn&apos;t exist or belongs to another account.
+            </p>
+          </Section>
 
-            <div className="glass-card border border-[rgba(59,130,246,0.14)] bg-[rgba(255,255,255,0.58)] p-8 text-center">
-              <h3 className="text-lg font-semibold text-[#0f172a]">
-                Ready to integrate?
-              </h3>
-              <p className="mt-2 text-[#475569]">
-                Generate your API key from the dashboard to get started.
-              </p>
-              <Link
-                href="/dashboard/api-keys"
-                className="primary-button mx-auto mt-6 h-10 px-6"
-              >
-                Get API Key
-                <ArrowRight className="size-4" />
-              </Link>
-            </div>
-          </main>
-        </div>
+          <Section
+            id="delete-link"
+            title="Delete a link"
+            code={
+              <>
+                <CodeGroup snippets={requestSnippets({ method: "DELETE", path: "/api/v1/links/launch" })} />
+                <CodeBlock title="Response · 200" lang="json" code={JSON.stringify({ success: true }, null, 2)} />
+              </>
+            }
+          >
+            <Endpoint method="DELETE" path="/api/v1/links/:slug" />
+            <p>
+              Deletes the link and its click history. The short URL stops working immediately. This can&apos;t
+              be undone.
+            </p>
+          </Section>
+
+          <Section
+            id="errors"
+            title="Errors"
+            code={<CodeBlock title="Error body" lang="json" code={JSON.stringify({ error: "Slug already exists" }, null, 2)} />}
+          >
+            <p>
+              Errors use standard HTTP status codes and a JSON body with an <code>error</code> message.
+            </p>
+            <dl className="divide-y border-y">
+              {[
+                ["400", "The body failed validation, or the slug is already taken."],
+                ["401", "The API key is missing or invalid."],
+                ["404", "No link with that slug on your account."],
+                ["429", "Rate limit reached. See below."],
+              ].map(([status, text]) => (
+                <div key={status} className="flex gap-4 py-2.5">
+                  <dt className="w-10 shrink-0 font-mono text-[13px] text-foreground">{status}</dt>
+                  <dd>{text}</dd>
+                </div>
+              ))}
+            </dl>
+          </Section>
+
+          <Section id="rate-limits" title="Rate limits">
+            <p>
+              Creating links is limited to 100 requests per hour per API key. Past that, requests return{" "}
+              <code>429</code> with <code>{`{"error": "Hourly limit exceeded"}`}</code> until the hour resets.
+            </p>
+            <p>Listing, analytics, and delete requests aren&apos;t rate limited.</p>
+          </Section>
+        </main>
       </div>
     </div>
   );
