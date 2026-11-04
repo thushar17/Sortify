@@ -33,7 +33,8 @@
 
   --border: #e7e6e2;
   --border-strong: #d6d5d0;
-  --input: #d6d5d0;
+  /* Form control borders meet WCAG 3:1 against every surface they sit on. */
+  --input: #8f8e88;
   --ring: #0f7b5f;
 
   --chart-1: #0f7b5f;
@@ -71,7 +72,7 @@
 
   --border: #262624;
   --border-strong: #34332f;
-  --input: #34332f;
+  --input: #6a6963;
   --ring: #3dbe94;
 
   --chart-1: #3dbe94;
